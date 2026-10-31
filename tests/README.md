@@ -26,15 +26,6 @@ Version sources: [Home Assistant](https://pypi.org/project/homeassistant/2026.10
 [test helpers](https://pypi.org/project/pytest-homeassistant-custom-component/0.13.375/),
 [Python](https://www.python.org/downloads/release/python-31410/).
 
-# Device registry regression coverage
-
-`test_device_entry` checks that standalone devices have no parent and hub
-subdevices reference the hub's device registry ID. It also rejects Home Assistant
-log messages about the deprecated `via_device` argument to
-`device_registry.async_get_or_create`. These are log messages rather than Python
-warnings, so pytest warning filters alone do not catch them. The shared log
-helper only prints warnings from the integration's own logger.
-
 # Useful commands
 
 Command | Description
