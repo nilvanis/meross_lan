@@ -54,8 +54,8 @@ async def test_mqtthub_entry_notready(request, hass: "HomeAssistant"):
             1,
             message=(
                 r"HAMQTTConnection\(############0:@0\): "
-                r"HomeAssistantError\(Cannot subscribe to topic '/appliance/\+/publish', "
-                r"make sure MQTT is set up correctly\) in async_mqtt_subscribe"
+                r"HomeAssistantError\(mqtt_not_setup_cannot_subscribe\) "
+                r"in async_mqtt_subscribe"
             ),
         )
 
