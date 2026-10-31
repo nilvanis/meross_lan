@@ -1,0 +1,82 @@
+name: Shared home checks
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to test
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Check home release metadata
+        run: python scripts/home_publish.py --check
+      - name: HACS validation
+        uses: hacs/action@main
+        env:
+          REPOSITORY_REF: ${{ inputs.ref }}
+        with:
+          category: integration
+          repository: ${{ github.repository }}
+          ignore: brands
+          comment: false
+      - name: Hassfest validation
+        uses: home-assistant/actions/hassfest@master
+
+  style:
+    name: Check Python formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install black==26.10.1
+      - name: Check Python files maintained by the home fork
+        run: >-
+          black --check scripts
+          custom_components/meross_lan/climate.py
+          custom_components/meross_lan/devices/hub/mts100.py
+          custom_components/meross_lan/devices/thermostat/mts200.py
+          custom_components/meross_lan/devices/thermostat/mts300.py
+          tests/entities/climate.py tests/test_climate_schedule.py
+
+  tests:
+    name: Test integration and AUTO contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Test automation without Home Assistant dependencies
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Install integration test dependencies
+        run: python -m pip install -r requirements_test.txt
+      - name: Require AUTO regression coverage
+        run: test -f tests/test_climate_schedule.py
+      - name: Test integration
+        run: >-
+          pytest -qq --timeout=180 --durations=10 -n auto
+          --cov custom_components.meross_lan
+          -o console_output_style=count -p no:sugar tests

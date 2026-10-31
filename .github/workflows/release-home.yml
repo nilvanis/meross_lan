@@ -1,0 +1,41 @@
+name: Check and release home version
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: home-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    if: github.repository == 'nilvanis/meross_lan'
+    uses: ./.github/workflows/home-checks.yml
+    with:
+      ref: ${{ github.sha }}
+
+  publish:
+    name: Publish checked fork commit
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Create immutable fork tag, ZIP and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TESTED_SHA: ${{ github.sha }}
+        run: python scripts/home_publish.py

@@ -12,6 +12,8 @@ MTS300 keeps `heat_cool` for regulation between two temperature limits; this is 
 
 **Install this fork:** in HACS, open **Custom repositories**, add `https://github.com/nilvanis/meross_lan` with type **Integration**, then download **Meross LAN (home version)** and restart Home Assistant. This fork uses the same `meross_lan` integration domain as upstream and replaces its code; manage it through one HACS repository at a time.
 
+Upstream stable releases are imported through pull requests with regression tests. See [update and release automation](docs/automation.md) for setup, versioning and conflict handling.
+
 ---
 
 [![hacs][hacsbadge]][hacs]

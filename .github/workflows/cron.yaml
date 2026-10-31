@@ -1,21 +1,16 @@
-name: Cron actions
+name: Daily home checks
 
 on:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "41 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  validate:
-    runs-on: "ubuntu-latest"
-    name: Validate
-    steps:
-        - uses: "actions/checkout@v4"
-
-        - name: HACS validation
-          uses: "hacs/action@main"
-          with:
-            category: "integration"
-            ignore: brands
-
-        - name: Hassfest validation
-          uses: "home-assistant/actions/hassfest@master"
+  checks:
+    if: github.repository == 'nilvanis/meross_lan'
+    uses: ./.github/workflows/home-checks.yml
+    with:
+      ref: ${{ github.sha }}
