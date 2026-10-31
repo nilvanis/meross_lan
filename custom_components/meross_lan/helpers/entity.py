@@ -219,7 +219,6 @@ class MLEntity(NamespaceParser, Loggable, entity.Entity if TYPE_CHECKING else ob
         self._context_set = None
         self.available = self._attr_available or manager.online
         self.device_class = device_class
-        self.device_info = self.manager.deviceentry_id  # type: ignore
 
         if "name" in kwargs:
             name = kwargs.pop("name")
@@ -240,6 +239,8 @@ class MLEntity(NamespaceParser, Loggable, entity.Entity if TYPE_CHECKING else ob
         # by default all of our entities have unique_id so they're registered
         # there could be some exceptions though (MLUpdate)
         self.unique_id = self._generate_unique_id()
+        # HA only allows device attachment for entities with a unique ID.
+        self.device_info = self.manager.deviceentry_id if self.unique_id else None  # type: ignore
         for _attr_name, _attr_value in kwargs.items():
             setattr(self, _attr_name, _attr_value)
 

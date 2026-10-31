@@ -25,14 +25,18 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import (
 
 from . import helpers
 
-pytest_plugins = "pytest_homeassistant_custom_component"
+pytest_plugins = (
+    "pytest_homeassistant_custom_component",
+    "pytester",
+    "tests.ha_logging",
+)
 
 
 # Test initialization must ensure custom_components are enabled
 # but we can't autouse a simple fixture for that since the recorder
 # need to be initialized first
 @pytest.fixture(autouse=True)
-def auto_enable(request: pytest.FixtureRequest):
+def auto_enable(request: pytest.FixtureRequest, fail_on_ha_logs):
     """
     Special initialization fixture managing recorder mocking.
     For some tests we need a working recorder but recorder_mock

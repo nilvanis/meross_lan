@@ -56,8 +56,12 @@ jobs:
           custom_components/meross_lan/devices/hub/mts100.py
           custom_components/meross_lan/devices/thermostat/mts200.py
           custom_components/meross_lan/devices/thermostat/mts300.py
+          custom_components/meross_lan/devices/hub/__init__.py
+          custom_components/meross_lan/helpers/device.py
+          custom_components/meross_lan/helpers/entity.py
           tests/entities/climate.py tests/test_climate_schedule.py
           tests/test_config_entry.py tests/test_meross_profile.py
+          tests/conftest.py tests/ha_logging.py tests/test_ha_logging.py
 
   tests:
     name: Test integration and AUTO contract
