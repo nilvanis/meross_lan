@@ -60,7 +60,7 @@ async def test_mqtthub_entry_notready(request, hass: "HomeAssistant"):
         )
 
 
-async def test_device_entry(request, hass: "HomeAssistant"):
+async def test_device_entry(request, hass: "HomeAssistant", caplog):
     """
     Generic device setup testing:
     we'll try to configure and setup devices according to our
@@ -77,6 +77,19 @@ async def test_device_entry(request, hass: "HomeAssistant"):
             descriptor = emulator.descriptor
             ability = descriptor.ability
             device = context.device
+
+            assert device.device_registry_entry.via_device_id is None
+            for subdevice in getattr(device, "subdevices", {}).values():
+                assert (
+                    subdevice.device_registry_entry.via_device_id
+                    == device.device_registry_entry.id
+                )
+            assert not [
+                record
+                for record in caplog.records
+                if "device_registry.async_get_or_create" in record.getMessage()
+                and "deprecated `via_device`" in record.getMessage()
+            ]
 
             entity_dnd = None
             if mn.Appliance_System_DNDMode.name in ability:

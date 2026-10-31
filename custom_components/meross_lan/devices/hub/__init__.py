@@ -591,7 +591,7 @@ class SubDevice(NamespaceParser, BaseDevice):
             logger=hub,
             name=get_productnameuuid(model, id),
             model=model,
-            via_device=next(iter(hub.deviceentry_id["identifiers"])),
+            via_device_id=hub.device_registry_entry.id,
         )
         self.platforms = hub.platforms
         hub.subdevices[id] = self
