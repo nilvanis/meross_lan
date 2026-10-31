@@ -1,58 +1,54 @@
-name: Pull actions
+name: Home pull request checks
 
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Exact candidate commit SHA to test
+        required: true
+        type: string
 
-env:
-  DEFAULT_PYTHON: "3.13"
+permissions:
+  contents: read
 
 jobs:
-  validate:
-    runs-on: "ubuntu-latest"
-    name: Validate
-    steps:
-        - uses: "actions/checkout@v4"
+  checks:
+    uses: ./.github/workflows/home-checks.yml
+    with:
+      ref: ${{ inputs.ref || github.sha }}
 
-        - name: HACS validation
-          uses: "hacs/action@main"
-          with:
-            category: "integration"
-            ignore: brands
-
-        - name: Hassfest validation
-          uses: "home-assistant/actions/hassfest@master"
-
-  style:
-    runs-on: "ubuntu-latest"
-    name: Check style formatting
-    steps:
-        - uses: "actions/checkout@v4"
-        - uses: "actions/setup-python@v5"
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-        - run: python3 -m pip install black
-        - run: black .
-
-  tests:
-    runs-on: "ubuntu-latest"
+  required:
     name: home/checks
+    if: always() && github.event_name == 'pull_request'
+    needs: checks
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out code from GitHub
-        uses: "actions/checkout@v4"
-      - name: Setup Python
-        uses: "actions/setup-python@v5"
+      - name: Require all checks to succeed
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success
+
+  status:
+    name: Record required home status
+    if: always() && github.event_name == 'workflow_dispatch'
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          CANDIDATE_SHA: ${{ inputs.ref || github.event.pull_request.head.sha }}
+          RESULT: ${{ needs.checks.result }}
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
-      - name: Install requirements
-        run: python3 -m pip install -r requirements_test.txt
-      - name: Run tests
-        run: |
-          pytest \
-            -qq \
-            --timeout=120 \
-            --durations=10 \
-            -n auto \
-            --cov custom_components.meross_lan \
-            -o console_output_style=count \
-            -p no:sugar \
-            tests
+          script: |
+            const sha = process.env.CANDIDATE_SHA;
+            if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error('Expected a full candidate SHA');
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha,
+              state: process.env.RESULT === 'success' ? 'success' : 'failure',
+              context: 'home/checks',
+              description: 'Integration, AUTO contract, metadata and automation checks',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
