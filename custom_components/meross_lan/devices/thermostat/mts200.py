@@ -28,7 +28,6 @@ class Mts200Climate(MtsThermostatClimate):
         mc.MTS200_MODE_HEAT: MtsThermostatClimate.Preset.COMFORT,
         mc.MTS200_MODE_COOL: MtsThermostatClimate.Preset.SLEEP,
         mc.MTS200_MODE_ECO: MtsThermostatClimate.Preset.AWAY,
-        mc.MTS200_MODE_AUTO: MtsThermostatClimate.Preset.AUTO,
     }
     MTS_MODE_TO_TEMPERATUREKEY_MAP = mc.MTS200_MODE_TO_TARGETTEMP_MAP
 
@@ -65,13 +64,18 @@ class Mts200Climate(MtsThermostatClimate):
                 MtsThermostatClimate.HVACMode.OFF,
                 MtsThermostatClimate.HVACMode.HEAT,
                 MtsThermostatClimate.HVACMode.COOL,
+                MtsThermostatClimate.HVACMode.AUTO,
             ]
 
     # interface: MtsClimate
     def flush_state(self, /):
         self.preset_mode = self.MTS_MODE_TO_PRESET_MAP.get(self._mts_mode)
         if self._mts_onoff:
-            self.hvac_mode = self.MTS_SUMMERMODE_TO_HVAC_MODE.get(self._mts_summermode)
+            self.hvac_mode = (
+                MtsThermostatClimate.HVACMode.AUTO
+                if self._mts_mode == mc.MTS200_MODE_AUTO
+                else self.MTS_SUMMERMODE_TO_HVAC_MODE.get(self._mts_summermode)
+            )
             self.hvac_action = (
                 self.MTS_SUMMERMODE_TO_HVAC_ACTION.get(self._mts_summermode)
                 if self._mts_active
@@ -87,6 +91,10 @@ class Mts200Climate(MtsThermostatClimate):
         if hvac_mode == MtsThermostatClimate.HVACMode.OFF:
             await self.async_request_onoff(0)
             return
+        if hvac_mode == MtsThermostatClimate.HVACMode.AUTO:
+            # Schedule mode is independent of the heating/cooling direction.
+            await self.async_request_preset(mc.MTS200_MODE_AUTO)
+            return
 
         if self._mts_summermode_supported:
             # this is an indicator the device supports it
@@ -94,6 +102,9 @@ class Mts200Climate(MtsThermostatClimate):
             if self._mts_summermode != summermode:
                 await self.async_request_summermode(summermode)
 
+        if self._mts_mode == mc.MTS200_MODE_AUTO:
+            await self.async_request_preset(mc.MTS200_MODE_MANUAL)
+            return
         await self.async_request_onoff(1)
 
     async def async_set_temperature(self, /, **kwargs):

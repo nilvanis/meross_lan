@@ -38,7 +38,6 @@ class MtsClimate(me.MLEntity, climate.ClimateEntity):
         COMFORT = "comfort"
         SLEEP = "sleep"
         AWAY = "away"
-        AUTO = "auto"
 
     class TrackSensorSelect(me.MEAlwaysAvailableMixin, MLSelect):
         """
@@ -394,7 +393,7 @@ class MtsClimate(me.MLEntity, climate.ClimateEntity):
     """Determines the behavior of async_set_temperature."""
 
     # HA core entity attributes:
-    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT]
+    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
     _attr_preset_modes = list(Preset)
     _attr_supported_features = (
         climate.ClimateEntityFeature.PRESET_MODE

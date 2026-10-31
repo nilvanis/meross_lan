@@ -1,6 +1,22 @@
+# Meross LAN (home version)
+
+This fork of [krahabb/meross_lan](https://github.com/krahabb/meross_lan) changes how thermostat schedules are exposed to Home Assistant:
+
+- **Schedule is an HVAC mode:** select `hvac_mode: auto` to run the device's schedule across all supported thermostat families.
+- **The generic `auto` preset is removed.** Other presets, such as comfort, sleep and away, remain available where supported.
+- **HACS displays this fork as `Meross LAN (home version)`.** Release tags and the integration version follow the corresponding upstream release exactly.
+
+**Migration:** replace `climate.set_preset_mode` calls with `preset_mode: auto` by `climate.set_hvac_mode` calls with `hvac_mode: auto`. Update scenes, templates and dashboard cards that inspect the old preset or expect the HVAC state to remain `heat` while a schedule is active. Setting a target temperature in AUTO switches to manual operation. Existing device and entity identifiers are retained.
+
+MTS300 keeps `heat_cool` for regulation between two temperature limits; this is separate from scheduled operation. MTS960 keeps `schedule_heating` and `schedule_cooling` presets to choose the direction within HVAC AUTO. Changes cover the MTS100/MTS150, MTS200-compatible (including MTS215B), MTS300 and MTS960 handlers; support for a handler does not imply that every device and firmware variant has been physically tested.
+
+**Install this fork:** in HACS, open **Custom repositories**, add `https://github.com/nilvanis/meross_lan` with type **Integration**, then download **Meross LAN (home version)** and restart Home Assistant. This fork uses the same `meross_lan` integration domain as upstream and replaces its code; manage it through one HACS repository at a time.
+
+---
+
 [![hacs][hacsbadge]][hacs]
-![GitHub last commit](https://img.shields.io/github/last-commit/krahabb/meross_lan?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/krahabb/meross_lan/cron.yaml?label=Cron&style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/nilvanis/meross_lan?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nilvanis/meross_lan/cron.yaml?label=Cron&style=for-the-badge)
 [![GitHub](https://img.shields.io/github/license/krahabb/meross_lan?style=for-the-badge)](LICENSE)
 
 # Meross LAN
@@ -20,7 +36,7 @@ HAVE FUN! 😎
 
 ### HACS
 
-In your HA frontend go to `HACS -> Integrations`, search for 'Meross LAN' and hit 'Install'
+In HACS, add `https://github.com/nilvanis/meross_lan` as a custom repository with type **Integration**, then download **Meross LAN (home version)**.
 You'll have to restart HA to let it recognize the new integration.
 
 ### Manual installation
