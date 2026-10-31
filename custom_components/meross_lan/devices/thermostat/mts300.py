@@ -135,7 +135,6 @@ class Mts300Climate(MtsThermostatClimate):
 
     MTS_MODE_TO_PRESET_MAP = {
         mc.MTS300_WORK_MANUAL: MtsThermostatClimate.Preset.CUSTOM,
-        mc.MTS300_WORK_SCHEDULE: MtsThermostatClimate.Preset.AUTO,
     }
 
     # Mts300Climate class attributes
@@ -191,7 +190,10 @@ class Mts300Climate(MtsThermostatClimate):
 
     # HA core entity attributes:
     _attr_fan_modes = list(FAN_MODE_TO_FAN_SPEED_MAP)
-    _attr_hvac_modes = list(HVAC_MODE_TO_MODE_MAP)
+    _attr_hvac_modes = [
+        *HVAC_MODE_TO_MODE_MAP,
+        MtsThermostatClimate.HVACMode.AUTO,
+    ]
     _attr_preset_modes = list(MTS_MODE_TO_PRESET_MAP.values())
     _attr_supported_features = (
         MtsThermostatClimate.ClimateEntityFeature.PRESET_MODE
@@ -250,8 +252,8 @@ class Mts300Climate(MtsThermostatClimate):
 
     async def async_shutdown(self):
         await super().async_shutdown()
-        self.switch_fan_hold = None  # type:ignore
-        self.number_fan_hold = None  # type:ignore
+        self.switch_fan_hold = None  # type: ignore
+        self.number_fan_hold = None  # type: ignore
 
     # interface: MtsClimate
     def set_unavailable(self):
@@ -263,7 +265,20 @@ class Mts300Climate(MtsThermostatClimate):
 
     @override
     async def async_set_hvac_mode(self, hvac_mode: MtsThermostatClimate.HVACMode):
-        await self._async_request_modeC({"mode": self.HVAC_MODE_TO_MODE_MAP[hvac_mode]})
+        if hvac_mode == MtsThermostatClimate.HVACMode.AUTO:
+            # The physical mode selects heat/cool; work selects the schedule.
+            await self._async_request_modeC(
+                {
+                    "mode": self._mts_mode or mc.MTS300_MODE_AUTO,
+                    "work": mc.MTS300_WORK_SCHEDULE,
+                }
+            )
+            return
+
+        payload = {"mode": self.HVAC_MODE_TO_MODE_MAP[hvac_mode]}
+        if hvac_mode != MtsThermostatClimate.HVACMode.OFF:
+            payload["work"] = mc.MTS300_WORK_MANUAL
+        await self._async_request_modeC(payload)
 
     @override
     async def async_set_temperature(self, **kwargs):
@@ -278,7 +293,7 @@ class Mts300Climate(MtsThermostatClimate):
         target_temp_high = kwargs.get(self.ATTR_TARGET_TEMP_HIGH)
 
         # Make sure the combination of arguments passed is sane
-        if target_temp and mode == MtsThermostatClimate.HVACMode.HEAT_COOL:
+        if target_temp and mode == mc.MTS300_MODE_AUTO:
             raise ValueError(
                 "set_temperature cannot accept a single temperature parameter in 'heat_cool' mode"
             )
@@ -444,6 +459,9 @@ class Mts300Climate(MtsThermostatClimate):
                         )
                     ]
                     self.target_temperature = None
+
+            if self.is_mts_scheduled():
+                self.hvac_mode = MtsThermostatClimate.HVACMode.AUTO
 
             self.flush_state()
         except Exception as e:

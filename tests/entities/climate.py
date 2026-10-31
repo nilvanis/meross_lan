@@ -17,30 +17,30 @@ from custom_components.meross_lan.merossclient.protocol.namespaces import (
 from tests.entities import EntityComponentTest
 
 HVAC_MODES: dict[type[MtsClimate], set[HVACMode]] = {
-    Mts100Climate: {HVACMode.OFF, HVACMode.HEAT},
-    Mts200Climate: {HVACMode.OFF, HVACMode.HEAT},
-    Mts300Climate: {HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL, HVACMode.HEAT_COOL},
+    Mts100Climate: {HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO},
+    Mts200Climate: {HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO},
+    Mts300Climate: {
+        HVACMode.OFF,
+        HVACMode.HEAT,
+        HVACMode.COOL,
+        HVACMode.HEAT_COOL,
+        HVACMode.AUTO,
+    },
     Mts960Climate: {HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL, HVACMode.AUTO},
 }
 
 PRESET_MODES: dict[type[MtsClimate], set] = {
-    Mts100Climate: {
-        mc.MTS100_MODE_CUSTOM,
-        mc.MTS100_MODE_HEAT,
-        mc.MTS100_MODE_COOL,
-        mc.MTS100_MODE_ECO,
-        mc.MTS100_MODE_AUTO,
-    },
-    Mts200Climate: {
-        mc.MTS200_MODE_HEAT,
-        mc.MTS200_MODE_COOL,
-        mc.MTS200_MODE_ECO,
-        mc.MTS200_MODE_AUTO,
-        mc.MTS200_MODE_MANUAL,
-    },
-    Mts300Climate: {
-        mc.MTS300_WORK_MANUAL,
-        mc.MTS300_WORK_SCHEDULE,
+    Mts100Climate: {"custom", "comfort", "sleep", "away"},
+    Mts200Climate: {"custom", "comfort", "sleep", "away"},
+    Mts300Climate: {"custom"},
+    Mts960Climate: {
+        "heating",
+        "cooling",
+        "schedule_heating",
+        "schedule_cooling",
+        "timer_cycle",
+        "timer_countdown_on",
+        "timer_countdown_off",
     },
 }
 
@@ -72,20 +72,8 @@ class EntityTest(EntityComponentTest):
         if mn_t.Appliance_Control_Thermostat_SummerMode.name in self.ability:
             assert HVACMode.COOL in entity_hvac_modes
 
-        try:
-            class_preset_modes = PRESET_MODES[entity.__class__]
-            entity_preset_modes = set(entity.preset_modes)
-            expected_preset_modes = {
-                entity.MTS_MODE_TO_PRESET_MAP[mts_mode]
-                for mts_mode in class_preset_modes
-            }
-            assert expected_preset_modes == entity_preset_modes
-        except KeyError:
-            # likely an Mts960
-            assert (
-                type(entity) is Mts960Climate
-            ), f"Class: <>{entity.__class__} is not Mts960Climate"
-            # TODO custom checking here..
+        assert set(entity.preset_modes) == PRESET_MODES[entity.__class__]
+        assert "auto" not in entity.preset_modes
 
         if mn.Appliance_Control_Sensor_Latest.name in self.ability:
             # this is prone to false checks depending on the

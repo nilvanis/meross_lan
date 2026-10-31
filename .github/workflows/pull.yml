@@ -35,7 +35,7 @@ jobs:
 
   tests:
     runs-on: "ubuntu-latest"
-    name: Run tests
+    name: home/checks
     steps:
       - name: Check out code from GitHub
         uses: "actions/checkout@v4"

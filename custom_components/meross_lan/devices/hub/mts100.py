@@ -62,7 +62,6 @@ class Mts100Climate(MtsClimate):
         mc.MTS100_MODE_HEAT: MtsClimate.Preset.COMFORT,
         mc.MTS100_MODE_COOL: MtsClimate.Preset.SLEEP,
         mc.MTS100_MODE_ECO: MtsClimate.Preset.AWAY,
-        mc.MTS100_MODE_AUTO: MtsClimate.Preset.AUTO,
     }
     # when setting target temp we'll set an appropriate payload key
     # for the mts100 depending on current 'preset' mode.
@@ -107,7 +106,11 @@ class Mts100Climate(MtsClimate):
     def flush_state(self, /):
         self.preset_mode = self.MTS_MODE_TO_PRESET_MAP.get(self._mts_mode)
         if self._mts_onoff:
-            self.hvac_mode = MtsClimate.HVACMode.HEAT
+            self.hvac_mode = (
+                MtsClimate.HVACMode.AUTO
+                if self._mts_mode == mc.MTS100_MODE_AUTO
+                else MtsClimate.HVACMode.HEAT
+            )
             if self.switch_patch_hvacaction.is_on:
                 # locally compute the state of the valve ignoring what's being
                 # reported in self._mts_active (see #331)
@@ -132,6 +135,12 @@ class Mts100Climate(MtsClimate):
     async def async_set_hvac_mode(self, hvac_mode: MtsClimate.HVACMode):
         if hvac_mode == MtsClimate.HVACMode.OFF:
             await self.async_request_onoff(0)
+            return
+        if hvac_mode == MtsClimate.HVACMode.AUTO:
+            await self.async_request_preset(mc.MTS100_MODE_AUTO)
+            return
+        if self._mts_mode == mc.MTS100_MODE_AUTO:
+            await self.async_request_preset(mc.MTS100_MODE_CUSTOM)
             return
         await self.async_request_onoff(1)
 
