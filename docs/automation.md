@@ -29,6 +29,14 @@ tests, metadata, HACS and hassfest. Formatting is checked, without rewriting fil
 for Python files maintained by this fork. Existing formatting differences in
 unrelated upstream files are outside that check.
 
+The integration tests use stable Home Assistant **2026.10.4** with its matching
+`pytest-homeassistant-custom-component` **0.13.375**, both pinned in the requirements
+files. All Python jobs read **3.14.10** from `.python-version`; the development
+container uses the verified `3.14-bookworm` image pinned by digest to that patch.
+These pins keep a future install from silently selecting a beta. Update the
+Home Assistant/test helper pair together and align the Python file and container
+image when changing the interpreter version. See [test setup](../tests/README.md).
+
 Review the PR and select **Create a merge commit**. Do not squash or rebase an
 upstream update: preserving upstream ancestry lets Git recognize changes already
 imported on subsequent updates. Automatic merging is intentionally disabled.
