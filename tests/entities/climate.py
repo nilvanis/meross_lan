@@ -30,9 +30,9 @@ HVAC_MODES: dict[type[MtsClimate], set[HVACMode]] = {
 }
 
 PRESET_MODES: dict[type[MtsClimate], set] = {
-    Mts100Climate: {"custom", "comfort", "sleep", "away"},
-    Mts200Climate: {"custom", "comfort", "sleep", "away"},
-    Mts300Climate: {"custom"},
+    Mts100Climate: {"none", "comfort", "sleep", "away"},
+    Mts200Climate: {"none", "comfort", "sleep", "away"},
+    Mts300Climate: set(),
     Mts960Climate: {
         "heating",
         "cooling",
@@ -74,6 +74,9 @@ class EntityTest(EntityComponentTest):
 
         assert set(entity.preset_modes) == PRESET_MODES[entity.__class__]
         assert "auto" not in entity.preset_modes
+        assert bool(entity.preset_modes) == (
+            haec.ClimateEntityFeature.PRESET_MODE in entity.supported_features
+        )
 
         if mn.Appliance_Control_Sensor_Latest.name in self.ability:
             # this is prone to false checks depending on the

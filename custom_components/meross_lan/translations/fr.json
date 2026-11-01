@@ -7,9 +7,9 @@
                         "state": {
                             "off": "Désactivé",
                             "custom": "Manuel",
-                            "comfort": "Confort (chaleur)",
-                            "sleep": "Sommeil (froid)",
-                            "away": "Absent (économique)",
+                            "comfort": "Confort",
+                            "sleep": "Sommeil",
+                            "away": "Absent",
                             "auto": "Auto",
                             "heating": "Chauffage",
                             "cooling": "Refroidissement",

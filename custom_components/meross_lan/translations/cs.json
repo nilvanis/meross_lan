@@ -7,9 +7,9 @@
                         "state": {
                             "off": "Vypnuto",
                             "custom": "Ruční",
-                            "comfort": "Komfort (teplo)",
-                            "sleep": "Spánek (v pohodě)",
-                            "away": "Pryč (ekonomika)",
+                            "comfort": "Komfort",
+                            "sleep": "Spánek",
+                            "away": "Pryč",
                             "auto": "Automatický",
                             "heating": "Topení",
                             "cooling": "Chlazení",

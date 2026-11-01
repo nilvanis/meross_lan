@@ -34,7 +34,8 @@ async def async_setup_entry(
 class MtsClimate(me.MLEntity, climate.ClimateEntity):
 
     class Preset(enum.StrEnum):
-        CUSTOM = "custom"
+        NONE = climate.PRESET_NONE
+        """No setpoint preset: the HVAC mode selects manual or schedule."""
         COMFORT = "comfort"
         SLEEP = "sleep"
         AWAY = "away"
@@ -495,7 +496,11 @@ class MtsClimate(me.MLEntity, climate.ClimateEntity):
         raise NotImplementedError()
 
     async def async_set_preset_mode(self, preset_mode: str):
-        mode = reverse_lookup(self.MTS_MODE_TO_PRESET_MAP, preset_mode)
+        if preset_mode == self.preset_mode:
+            # keep the device mode so that 'none' doesn't bump a schedule to manual
+            mode = self._mts_mode
+        else:
+            mode = reverse_lookup(self.MTS_MODE_TO_PRESET_MAP, preset_mode)
         if mode is not None:
             await self.async_request_preset(mode)
 

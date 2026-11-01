@@ -5,7 +5,11 @@ import logging
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, call, patch
 
-from homeassistant.components.climate import HVACAction, HVACMode
+from homeassistant.components.climate import (
+    ClimateEntityFeature,
+    HVACAction,
+    HVACMode,
+)
 import pytest
 
 from custom_components.meross_lan.climate import MtsClimate
@@ -74,6 +78,7 @@ def make_climate():
         climate.hvac_action = None
         climate.hvac_modes = climate._attr_hvac_modes
         climate.preset_modes = climate._attr_preset_modes
+        climate.supported_features = climate._attr_supported_features
         climate.number_preset_temperature = {}
         climate.sensor_current_temperature = Mock()
         climate.select_track_sensor = Mock()
@@ -126,7 +131,7 @@ def test_schedule_is_advertised_as_hvac_mode(make_climate, climate_type):
     assert HVACMode.AUTO in climate.hvac_modes
     assert "auto" not in climate.preset_modes
     expected_presets = (
-        {"custom"}
+        set()
         if climate_type is Mts300Climate
         else (
             {
@@ -139,10 +144,13 @@ def test_schedule_is_advertised_as_hvac_mode(make_climate, climate_type):
                 "timer_countdown_off",
             }
             if climate_type is Mts960Climate
-            else {"custom", "comfort", "sleep", "away"}
+            else {"none", "comfort", "sleep", "away"}
         )
     )
     assert set(climate.preset_modes) == expected_presets
+    assert bool(expected_presets) == (
+        ClimateEntityFeature.PRESET_MODE in climate.supported_features
+    )
 
 
 @pytest.mark.parametrize("climate_type", CLIMATE_TYPES)
@@ -202,9 +210,10 @@ async def test_auto_enables_schedule_and_survives_refresh(
     assert climate.is_mts_scheduled()
     refresh(climate)
     assert climate.hvac_mode == HVACMode.AUTO
-    assert climate.preset_mode == (
-        "schedule_heating" if climate_type is Mts960Climate else None
-    )
+    assert climate.preset_mode == {
+        Mts300Climate: None,
+        Mts960Climate: "schedule_heating",
+    }.get(climate_type, "none")
 
 
 @pytest.mark.parametrize("climate_type", CLIMATE_TYPES)
@@ -323,6 +332,78 @@ async def test_other_presets_keep_their_meaning(
     refresh(climate)
     assert climate.preset_mode == preset
     assert climate.hvac_mode == HVACMode.HEAT
+
+
+@pytest.mark.parametrize("climate_type", [Mts100Climate, Mts200Climate])
+@pytest.mark.parametrize("start_off", [False, True], ids=["on", "off"])
+async def test_none_preset_keeps_schedule(make_climate, climate_type, start_off):
+    climate = make_climate(climate_type)
+    await climate.async_set_hvac_mode(HVACMode.AUTO)
+    if start_off:
+        await climate.async_set_hvac_mode(HVACMode.OFF)
+    assert climate.preset_mode == "none"
+    climate.manager.async_request_ack.reset_mock()
+
+    await climate.async_set_preset_mode("none")
+
+    if climate_type is Mts100Climate:
+        expected_calls = [
+            call(
+                "Appliance.Hub.Mts100.Mode",
+                "SET",
+                {"mode": [{"id": "valve", "state": 3}]},
+            )
+        ]
+        if start_off:
+            expected_calls.append(
+                call(
+                    "Appliance.Hub.ToggleX",
+                    "SET",
+                    {"togglex": [{"id": "valve", "onoff": 1}]},
+                )
+            )
+    else:
+        expected_calls = [
+            call(
+                "Appliance.Control.Thermostat.Mode",
+                "SET",
+                {"mode": [{"channel": 0, "mode": 3, "onoff": 1}]},
+            )
+        ]
+    assert climate.manager.async_request_ack.await_args_list == expected_calls
+    refresh(climate)
+    assert climate.hvac_mode == HVACMode.AUTO
+    assert climate.preset_mode == "none"
+    assert climate.is_mts_scheduled()
+
+
+@pytest.mark.parametrize("climate_type", [Mts100Climate, Mts200Climate])
+async def test_none_preset_leaves_setpoint_preset_for_manual(
+    make_climate, climate_type
+):
+    climate = make_climate(climate_type)
+    assert climate.preset_mode == "none"
+    await climate.async_set_preset_mode("comfort")
+    climate.manager.async_request_ack.reset_mock()
+
+    await climate.async_set_preset_mode("none")
+
+    if climate_type is Mts100Climate:
+        expected = call(
+            "Appliance.Hub.Mts100.Mode",
+            "SET",
+            {"mode": [{"id": "valve", "state": 0}]},
+        )
+    else:
+        expected = call(
+            "Appliance.Control.Thermostat.Mode",
+            "SET",
+            {"mode": [{"channel": 0, "mode": 4, "onoff": 1}]},
+        )
+    assert climate.manager.async_request_ack.await_args_list == [expected]
+    refresh(climate)
+    assert climate.hvac_mode == HVACMode.HEAT
+    assert climate.preset_mode == "none"
 
 
 @pytest.mark.parametrize("climate_type", CLIMATE_TYPES)

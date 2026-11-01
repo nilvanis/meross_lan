@@ -7,9 +7,9 @@
                         "state": {
                             "off": "Aus",
                             "custom": "Manuell",
-                            "comfort": "Komfort (wärme)",
-                            "sleep": "Schlaf (kühl)",
-                            "away": "Abwesend (wirtschaft)",
+                            "comfort": "Komfort",
+                            "sleep": "Schlaf",
+                            "away": "Abwesend",
                             "auto": "Automatisch",
                             "heating": "Heizung",
                             "cooling": "Kühlung",

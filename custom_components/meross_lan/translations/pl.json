@@ -7,9 +7,9 @@
                         "state": {
                             "off": "Wyłączony",
                             "custom": "Ręczny",
-                            "comfort": "Komfort (ciepło)",
-                            "sleep": "Sen (chłodno)",
-                            "away": "Poza domem (ekonomia)",
+                            "comfort": "Komfort",
+                            "sleep": "Sen",
+                            "away": "Poza domem",
                             "auto": "Auto",
                             "heating": "Grzanie",
                             "cooling": "Chłodzenie",
