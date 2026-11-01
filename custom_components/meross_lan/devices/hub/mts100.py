@@ -58,10 +58,11 @@ class Mts100Climate(MtsClimate):
             ).get(mc.KEY_SCHEDULEUNITTIME, 15)
 
     MTS_MODE_TO_PRESET_MAP = {
-        mc.MTS100_MODE_CUSTOM: MtsClimate.Preset.CUSTOM,
+        mc.MTS100_MODE_CUSTOM: MtsClimate.Preset.NONE,
         mc.MTS100_MODE_HEAT: MtsClimate.Preset.COMFORT,
         mc.MTS100_MODE_COOL: MtsClimate.Preset.SLEEP,
         mc.MTS100_MODE_ECO: MtsClimate.Preset.AWAY,
+        mc.MTS100_MODE_AUTO: MtsClimate.Preset.NONE,
     }
     # when setting target temp we'll set an appropriate payload key
     # for the mts100 depending on current 'preset' mode.

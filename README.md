@@ -4,9 +4,11 @@ This fork of [krahabb/meross_lan](https://github.com/krahabb/meross_lan) changes
 
 - **Schedule is an HVAC mode:** select `hvac_mode: auto` to run the device's schedule across all supported thermostat families.
 - **The generic `auto` preset is removed.** Other presets, such as comfort, sleep and away, remain available where supported.
+- **`none` replaces `custom` on MTS100/MTS150 and MTS200-compatible thermostats.** The preset is `none` whenever comfort, sleep or away is not active, both in manual operation and while a schedule runs; the HVAC mode tells them apart. Selecting `none` leaves comfort, sleep or away for manual operation and keeps a running schedule.
+- **MTS300 has no presets.** Its only remaining preset, `custom`, meant manual operation, which the `heat`, `cool` and `heat_cool` HVAC modes already select.
 - **HACS displays this fork as `Meross LAN (home version)`.** Release tags and the integration version follow the corresponding upstream release exactly.
 
-**Migration:** replace `climate.set_preset_mode` calls with `preset_mode: auto` by `climate.set_hvac_mode` calls with `hvac_mode: auto`. Update scenes, templates and dashboard cards that inspect the old preset or expect the HVAC state to remain `heat` while a schedule is active. Setting a target temperature in AUTO switches to manual operation. Existing device and entity identifiers are retained.
+**Migration:** replace `climate.set_preset_mode` calls with `preset_mode: auto` by `climate.set_hvac_mode` calls with `hvac_mode: auto`. Update scenes, templates and dashboard cards that inspect the old preset or expect the HVAC state to remain `heat` while a schedule is active. Setting a target temperature in AUTO switches to manual operation. On MTS100/MTS150 and MTS200-compatible thermostats, replace `preset_mode: custom` by `preset_mode: none`. On MTS300, replace `climate.set_preset_mode` calls with `preset_mode: custom` by `climate.set_hvac_mode` calls with `heat`, `cool` or `heat_cool`. Existing device and entity identifiers are retained.
 
 MTS300 keeps `heat_cool` for regulation between two temperature limits; this is separate from scheduled operation. MTS960 keeps `schedule_heating` and `schedule_cooling` presets to choose the direction within HVAC AUTO. Changes cover the MTS100/MTS150, MTS200-compatible (including MTS215B), MTS300 and MTS960 handlers; support for a handler does not imply that every device and firmware variant has been physically tested.
 

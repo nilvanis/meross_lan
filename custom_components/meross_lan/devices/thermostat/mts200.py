@@ -24,10 +24,11 @@ class Mts200Climate(MtsThermostatClimate):
         ns = mn_t.Appliance_Control_Thermostat_Schedule
 
     MTS_MODE_TO_PRESET_MAP = {
-        mc.MTS200_MODE_MANUAL: MtsThermostatClimate.Preset.CUSTOM,
+        mc.MTS200_MODE_MANUAL: MtsThermostatClimate.Preset.NONE,
         mc.MTS200_MODE_HEAT: MtsThermostatClimate.Preset.COMFORT,
         mc.MTS200_MODE_COOL: MtsThermostatClimate.Preset.SLEEP,
         mc.MTS200_MODE_ECO: MtsThermostatClimate.Preset.AWAY,
+        mc.MTS200_MODE_AUTO: MtsThermostatClimate.Preset.NONE,
     }
     MTS_MODE_TO_TEMPERATUREKEY_MAP = mc.MTS200_MODE_TO_TARGETTEMP_MAP
 

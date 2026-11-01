@@ -133,9 +133,8 @@ class Mts300Climate(MtsThermostatClimate):
     ns = mn_t.Appliance_Control_Thermostat_ModeC
     device_scale = mc.MTS300_TEMP_SCALE
 
-    MTS_MODE_TO_PRESET_MAP = {
-        mc.MTS300_WORK_MANUAL: MtsThermostatClimate.Preset.CUSTOM,
-    }
+    # No presets: 'work' schedule is HVAC AUTO and manual is HEAT/COOL/HEAT_COOL.
+    MTS_MODE_TO_PRESET_MAP = {}
 
     # Mts300Climate class attributes
     HVAC_MODE_TO_MODE_MAP = {
@@ -196,8 +195,7 @@ class Mts300Climate(MtsThermostatClimate):
     ]
     _attr_preset_modes = list(MTS_MODE_TO_PRESET_MAP.values())
     _attr_supported_features = (
-        MtsThermostatClimate.ClimateEntityFeature.PRESET_MODE
-        | MtsThermostatClimate.ClimateEntityFeature.TARGET_TEMPERATURE
+        MtsThermostatClimate.ClimateEntityFeature.TARGET_TEMPERATURE
         | getattr(MtsThermostatClimate.ClimateEntityFeature, "TURN_OFF", 0)
         | getattr(MtsThermostatClimate.ClimateEntityFeature, "TURN_ON", 0)
         | MtsThermostatClimate.ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
