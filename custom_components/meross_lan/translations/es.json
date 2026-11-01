@@ -7,9 +7,9 @@
                         "state": {
                             "off": "Apagado",
                             "custom": "Manual",
-                            "comfort": "Confort (calor)",
-                            "sleep": "Dormir (fresco)",
-                            "away": "Lejos (económico)",
+                            "comfort": "Confort",
+                            "sleep": "Dormir",
+                            "away": "Lejos",
                             "auto": "Auto",
                             "heating": "Calefacción",
                             "cooling": "Enfriamiento",

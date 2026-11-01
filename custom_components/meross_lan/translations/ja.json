@@ -7,9 +7,9 @@
                         "state": {
                             "off": "オフ",
                             "custom": "マニュアル",
-                            "comfort": "快適（熱）",
-                            "sleep": "スリープ（クール）",
-                            "away": "アウェイ（エコノミー）",
+                            "comfort": "快適",
+                            "sleep": "スリープ",
+                            "away": "アウェイ",
                             "auto": "自動",
                             "heating": "暖房",
                             "cooling": "冷却",
