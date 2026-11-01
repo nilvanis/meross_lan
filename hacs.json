@@ -2,7 +2,7 @@
   "name": "Meross LAN (home version)",
   "render_readme": true,
   "country": ["IT", "GB", "US", "JP", "ES", "FR", "DE", "PL"],
-  "homeassistant": "2024.5.0b0",
+  "homeassistant": "2026.8.0",
   "persistent_directory": "traces",
   "hacs": "1.6.0"
 }

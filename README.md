@@ -10,7 +10,7 @@ This fork of [krahabb/meross_lan](https://github.com/krahabb/meross_lan) changes
 
 MTS300 keeps `heat_cool` for regulation between two temperature limits; this is separate from scheduled operation. MTS960 keeps `schedule_heating` and `schedule_cooling` presets to choose the direction within HVAC AUTO. Changes cover the MTS100/MTS150, MTS200-compatible (including MTS215B), MTS300 and MTS960 handlers; support for a handler does not imply that every device and firmware variant has been physically tested.
 
-**Install this fork:** in HACS, open **Custom repositories**, add `https://github.com/nilvanis/meross_lan` with type **Integration**, then download **Meross LAN (home version)** and restart Home Assistant. This fork uses the same `meross_lan` integration domain as upstream and replaces its code; manage it through one HACS repository at a time.
+**Install this fork:** requires Home Assistant 2026.8 or newer. In HACS, open **Custom repositories**, add `https://github.com/nilvanis/meross_lan` with type **Integration**, then download **Meross LAN (home version)** and restart Home Assistant. This fork uses the same `meross_lan` integration domain as upstream and replaces its code; manage it through one HACS repository at a time.
 
 Upstream stable releases are imported through pull requests with regression tests. See [update and release automation](docs/automation.md) for setup, versioning and conflict handling.
 
