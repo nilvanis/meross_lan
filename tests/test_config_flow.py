@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryState, ConfigFl
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import discovery_flow
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
-from pytest_homeassistant_custom_component.common import async_fire_mqtt_message
+from pytest_homeassistant.common import async_fire_mqtt_message
 
 from custom_components.meross_lan import const as mlc
 from custom_components.meross_lan.config_flow import ConfigFlow

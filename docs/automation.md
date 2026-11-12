@@ -31,16 +31,15 @@ tests, metadata, HACS and hassfest. Formatting is checked, without rewriting fil
 for Python files maintained by this fork. Existing formatting differences in
 unrelated upstream files are outside that check.
 
-The integration tests use stable Home Assistant **2026.10.4** with its matching
-`pytest-homeassistant-custom-component` **0.13.375**, both pinned in the requirements
-files. All Python jobs read **3.14.10** from `.python-version`; the development
-container uses the verified `3.14-bookworm` image pinned by digest to that patch.
-The upstream v6 test suite uses a beta Home Assistant test package; this fork
-keeps its matching stable helper and adapts the suite to that API. Upstream
-development dependencies and the Bluetooth system support are retained.
-These pins keep a future install from silently selecting a beta. Update the
-Home Assistant/test helper pair together and align the Python file and container
-image when changing the interpreter version. See [test setup](../tests/README.md).
+The integration tests use upstream's requirements unchanged: Home Assistant and
+Home Assistant's official `pytest-homeassistant` test package, both pinned to the
+same release in `requirements_test.txt` (currently **2026.11.0**). Every upstream
+import brings upstream's pins, so the fork keeps no test pins of its own. All
+Python jobs read **3.14.10** from `.python-version`; the development container
+uses the verified `3.14-bookworm` image pinned by digest to that patch. Upstream
+development dependencies and the Bluetooth system support are retained. Align the
+Python file and container image when changing the interpreter version. See
+[test setup](../tests/README.md).
 
 Review the PR and select **Create a merge commit**. Do not squash or rebase an
 upstream update: preserving upstream ancestry lets Git recognize changes already

@@ -18,7 +18,7 @@
 from unittest.mock import patch
 
 import pytest
-from pytest_homeassistant_custom_component.test_util.aiohttp import (
+from pytest_homeassistant.test_util.aiohttp import (
     AiohttpClientMocker,
     mock_aiohttp_client,
 )
@@ -26,7 +26,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import (
 from . import helpers
 
 pytest_plugins = (
-    "pytest_homeassistant_custom_component",
+    "pytest_homeassistant",
     "pytester",
     "tests.ha_logging",
 )
@@ -49,8 +49,6 @@ def auto_enable(request: pytest.FixtureRequest, fail_on_ha_logs, disable_debug):
         has_recorder = "recorder_mock" in request.fixturenames
         if has_recorder:
             request.getfixturevalue("recorder_mock")
-        hass = request.getfixturevalue("hass")
-        hass.data.pop("custom_components", None)
     yield
 
 

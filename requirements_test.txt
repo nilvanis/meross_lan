@@ -28,8 +28,8 @@
 #pytest-homeassistant-custom-component @ git+https://github.com/MatthewFlamm/pytest-homeassistant-custom-component@0.13.340 # HA core 2026.6.4
 #pytest-homeassistant-custom-component @ git+https://github.com/MatthewFlamm/pytest-homeassistant-custom-component@0.13.363 # HA core 2026.9.0
 #pytest-homeassistant-custom-component @ git+https://github.com/MatthewFlamm/pytest-homeassistant-custom-component@0.13.371 # HA core 2026.10.0
-# Keep the test helper aligned with the stable Home Assistant pin in requirements_dev.txt.
-pytest-homeassistant-custom-component==0.13.375 # HA core 2026.10.4
+homeassistant==2026.11.0
+pytest-homeassistant==2026.11.0
 pytest-timeout
 pytest-cov
 pytest-xdist

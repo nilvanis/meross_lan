@@ -13,7 +13,7 @@ gtts
 ha-ffmpeg
 hassil
 home-assistant-intents
-homeassistant==2026.10.4
+homeassistant
 infrared-protocols
 janus
 mutagen

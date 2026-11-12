@@ -1,14 +1,15 @@
 # Why?
 
 Tests help catch changes that break integration behavior. Home Assistant uses
-[`pytest`](https://docs.pytest.org/en/latest/), and this repository uses
-`pytest-homeassistant-custom-component` to access its integration test helpers.
+[`pytest`](https://docs.pytest.org/en/latest/), and this repository uses its
+official `pytest-homeassistant` package to access the integration test helpers.
 
 # Getting Started
 
-The test environment is pinned to stable Home Assistant **2026.10.4** and
-`pytest-homeassistant-custom-component` **0.13.375**, using Python **3.14.10**.
-Home Assistant 2026.10.4 requires Python 3.14.2 or later. CI reads the interpreter
+The test environment follows upstream: Home Assistant and `pytest-homeassistant`
+are pinned to the same release (currently **2026.11.0**) in `requirements_test.txt`,
+using Python **3.14.10**. Home Assistant 2026.11 requires Python 3.14.2 or later.
+CI reads the interpreter
 version from `.python-version`; the devcontainer image is pinned to the same
 Python patch. Install Python 3.14.10, then create a virtual environment:
 
@@ -18,12 +19,12 @@ source venv/bin/activate
 python -m pip install -r requirements_test.txt
 ```
 
-`requirements_dev.txt` pins Home Assistant and `requirements_test.txt` pins its
-matching test helper package. Update the pair together; leaving either dependency
-unconstrained can introduce a newer Home Assistant or a beta into the test run.
+Both pins come from upstream and change with upstream imports. Keep the two
+versions equal: each `pytest-homeassistant` release matches the Home Assistant
+release of the same number.
 
-Version sources: [Home Assistant](https://pypi.org/project/homeassistant/2026.10.4/),
-[test helpers](https://pypi.org/project/pytest-homeassistant-custom-component/0.13.375/),
+Version sources: [Home Assistant](https://pypi.org/project/homeassistant/2026.11.0/),
+[test helpers](https://pypi.org/project/pytest-homeassistant/2026.11.0/),
 [Python](https://www.python.org/downloads/release/python-31410/).
 
 # Home Assistant compatibility checks
@@ -46,8 +47,8 @@ code. The general guard exposed the deprecated `via_device` argument, hub regist
 mapping lookups, and firmware entities attached to devices without unique IDs.
 
 These checks cover code paths exercised by tests on the installed Home Assistant
-version. Update the pinned HA/test helper pair to check newer Core releases; the
-daily workflow also uses those pins and does not select new versions automatically.
+version. Newer Core releases are checked when an upstream import updates the pins;
+the daily workflow also uses those pins and does not select new versions automatically.
 
 # Useful commands
 
