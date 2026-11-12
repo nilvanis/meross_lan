@@ -14,11 +14,11 @@ from freezegun.api import freeze_time
 from homeassistant import config_entries as ce, const as hac
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
-from pytest_homeassistant_custom_component.common import (
+from pytest_homeassistant.common import (
     MockConfigEntry,
     async_fire_time_changed_exact,
 )
-from pytest_homeassistant_custom_component.test_util.aiohttp import (
+from pytest_homeassistant.test_util.aiohttp import (
     AiohttpClientMockResponse,
 )
 
@@ -81,7 +81,7 @@ if TYPE_CHECKING:
     MqttMockHAClientGenerator = Callable[..., Coroutine[Any, Any, MqttMockHAClient]]
 
     from pytest import CaptureFixture, FixtureRequest, LogCaptureFixture
-    from pytest_homeassistant_custom_component.test_util.aiohttp import (
+    from pytest_homeassistant.test_util.aiohttp import (
         AiohttpClientMocker,
     )
 
@@ -1269,10 +1269,10 @@ class HAMQTTMocker(contextlib.AbstractAsyncContextManager):
     async def __aexit__(self, exc_type, exc_value, traceback):
         self.async_publish_patcher.stop()
         api: "ComponentApi" = self.hass.data[mlc.DOMAIN]
-        if api and api._mqtt_connection:
+        if api and api._mqttconnection:
             from homeassistant.components.mqtt.client import UNSUBSCRIBE_COOLDOWN
 
-            await api._mqtt_connection.async_disconnect()
+            await api._mqttconnection.async_disconnect()
             await asyncio.sleep(UNSUBSCRIBE_COOLDOWN)
 
         # patch the buggy behavior of the HA mqtt client mock which leaves a dangling timer
