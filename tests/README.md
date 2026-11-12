@@ -1,31 +1,19 @@
 # Why?
 
-Tests help catch changes that break integration behavior. Home Assistant uses
-[`pytest`](https://docs.pytest.org/en/latest/), and this repository uses its
-official `pytest-homeassistant` package to access the integration test helpers.
+While tests aren't required to publish a custom component for Home Assistant, they will generally make development easier because good tests will expose when changes you want to make to the component logic will break expected functionality. Home Assistant uses [`pytest`](https://docs.pytest.org/en/latest/) for its tests, and the tests that have been included are modeled after tests that are written for core Home Assistant integrations. These tests pass with 100% coverage (unless something has changed ;) ) and have comments to help you understand the purpose of different parts of the test.
 
 # Getting Started
 
-The test environment follows upstream: Home Assistant and `pytest-homeassistant`
-are pinned to the same release (currently **2026.11.0**) in `requirements_test.txt`,
-using Python **3.14.10**. Home Assistant 2026.11 requires Python 3.14.2 or later.
-CI reads the interpreter
-version from `.python-version`; the devcontainer image is pinned to the same
-Python patch. Install Python 3.14.10, then create a virtual environment:
-
+To begin, it is recommended to create a virtual environment to install dependencies:
 ```bash
-python3.14 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
-python -m pip install -r requirements_test.txt
 ```
 
-Both pins come from upstream and change with upstream imports. Keep the two
-versions equal: each `pytest-homeassistant` release matches the Home Assistant
-release of the same number.
+You can then install the dependencies that will allow you to run tests:
+`pip3 install -r requirements_test.txt.`
 
-Version sources: [Home Assistant](https://pypi.org/project/homeassistant/2026.11.0/),
-[test helpers](https://pypi.org/project/pytest-homeassistant/2026.11.0/),
-[Python](https://www.python.org/downloads/release/python-31410/).
+This will install `homeassistant`, `pytest`, and `pytest-homeassistant`, a plugin which allows you to leverage helpers that are available in Home Assistant for core integration tests.
 
 # Home Assistant compatibility checks
 
@@ -56,5 +44,6 @@ Command | Description
 ------- | -----------
 `pytest tests/` | This will run all tests in `tests/` and tell you how many passed/failed
 `pytest --durations=10 --cov-report term-missing --cov=custom_components.meross_lan tests` | This tells `pytest` that your target module to test is `custom_components.meross_lan` so that it can give you a [code coverage](https://en.wikipedia.org/wiki/Code_coverage) summary, including % of code that was executed and the line numbers of missed executions.
+`pytest tests/test_init.py -k test_setup_unload_and_reload_entry` | Runs the `test_setup_unload_and_reload_entry` test function located in `tests/test_init.py`
 `pytest tests/test_climate_schedule.py` | Runs the AUTO HVAC mode and schedule regression tests
 `pytest tests/test_ha_logging.py` | Verifies that unknown HA warnings/errors fail tests across the full test lifecycle

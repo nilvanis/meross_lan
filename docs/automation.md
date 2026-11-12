@@ -34,11 +34,10 @@ unrelated upstream files are outside that check.
 The integration tests use upstream's requirements unchanged: Home Assistant and
 Home Assistant's official `pytest-homeassistant` test package, both pinned to the
 same release in `requirements_test.txt` (currently **2026.11.0**). Every upstream
-import brings upstream's pins, so the fork keeps no test pins of its own. All
-Python jobs read **3.14.10** from `.python-version`; the development container
-uses the verified `3.14-bookworm` image pinned by digest to that patch. Upstream
-development dependencies and the Bluetooth system support are retained. Align the
-Python file and container image when changing the interpreter version. See
+import brings upstream's pins, so the fork keeps no test pins of its own. As
+upstream does, the Python jobs use the latest Python 3.14 release and the
+development container uses upstream's `3.14-bookworm` image. Upstream development
+dependencies and the Bluetooth system support are retained. See
 [test setup](../tests/README.md).
 
 Review the PR and select **Create a merge commit**. Do not squash or rebase an
