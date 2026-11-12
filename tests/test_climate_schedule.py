@@ -136,8 +136,9 @@ def make_climate():
             climate.switch_patch_hvacaction = SimpleNamespace(is_on=False)
             climate.binary_sensor_window = Mock()
             if climate_type is Mts150Climate:
-                climate.sensor_motor_position = None
-                climate.sensor_motor_start_count = None
+                # Valve motor sensors without a reading, as after a hub reboot.
+                for key in Mts150Climate.ENTITY_DEFS:
+                    setattr(climate, key, Mock(native_value=None))
             refresh(climate, mode=0, currentSet=210)
         elif climate_type is Mts200Climate:
             refresh(climate, mode=4, onoff=1, targetTemp=210, manualTemp=210)
